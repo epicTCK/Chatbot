@@ -121,7 +121,7 @@ function admin(input){
 
 function addSources(){
     var nlpSrc = document.createElement('script');
-    nlpSrc.setAttribute('src', 'https://npmcdn.com/nlp_compromise@latest/builds/nlp_compromise.min.js');
+    nlpSrc.setAttribute('src', 'https://unpkg.com/nlp_compromise@latest/builds/nlp_compromise.min.js');
     document.head.appendChild(nlpSrc);
 }
 function partOfSpeech(input){

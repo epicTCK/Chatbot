@@ -134,7 +134,6 @@ function admin(input){
     
 }
 function whatThink(input){
-    nlp = window.nlp_compromise;
     var sentances = [
         "what do you think of",
         "what do you think about",

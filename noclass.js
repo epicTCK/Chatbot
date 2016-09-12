@@ -134,7 +134,6 @@ function admin(input){
     
 }
 function whatThink(input){
-    console.log("message recieved:  " + input.txt);
     nlp = window.nlp_compromise;
     var sentances = [
         "what do you think of",
@@ -160,7 +159,9 @@ function whatThink(input){
         }
     }
 }
-
+function greeting(input){
+    
+}
 addModule(avocad);
 addModule(xkcd);
 addModule(admin);

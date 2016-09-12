@@ -90,7 +90,6 @@ function loop() {
 }
 
 function start() {
-    addSources();
     setInterval(loop, 5000);
 }
 
@@ -161,11 +160,8 @@ function whatThink(input){
         }
     }
 }
-function addSources(){
-    var nlpSrc = document.createElement('script');
-    nlpSrc.setAttribute('src', 'https://npmcdn.com/nlp_compromise@latest/builds/nlp_compromise.min.js');
-    document.head.appendChild(nlpSrc);
-}
+
 addModule(avocad);
 addModule(xkcd);
+addModule(admin);
 addModule(whatThink);

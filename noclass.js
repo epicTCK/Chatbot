@@ -21,6 +21,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
 class Message {
     constructor(user, txt, starNode, replyID) {
         this.replyID = replyID;
@@ -100,7 +101,7 @@ function addModule(callback) {
 
 
 function xkcd(input) {
-
+    if(input.user === name)return;
     if (input.txt.includes("xkcd")) {
         var split = input.txt.split(" ");
         var num = split[split.indexOf("xkcd") + 1];
@@ -113,12 +114,14 @@ function xkcd(input) {
     }
 }
 function avocad(input){
+    if(input.user === name)return;
     if(input.txt.toLowerCase().includes("avocad")){
         chat("https://authoritynutrition.com/wp-content/uploads/2014/09/avocado-sliced-in-half.jpg", input.replyID,false);
     }
 }
 
 function admin(input){
+
     if(input.user === owner){
      if(input.txt.split(' ')[0].toLowerCase() === "/stop"){
          chat("Standby mode activated",input.replyID, true);
@@ -132,6 +135,7 @@ function admin(input){
     
 }
 function whatThink(input){
+    if(input.user === name)return;
     var triggers = [
         "what do you think of",
         "what do you think about",
@@ -172,6 +176,7 @@ function whatThink(input){
     }
 }
 function greeting(input){
+    if(input.user === name)return;
     var triggers1 = [
         "what's up",
         "whats up",
@@ -216,3 +221,4 @@ addModule(avocad);
 addModule(xkcd);
 addModule(admin);
 addModule(whatThink);
+addModule(greeting);

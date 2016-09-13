@@ -178,6 +178,7 @@ function whatThink(input){
            return;
         }
     }
+    
 }
 function greeting(input){
     if(input.user === name)return;
@@ -211,13 +212,29 @@ function greeting(input){
         "better than u i know thats 4 shur",
         "the sky"
     ];
- 
+    var responses2 = [
+        "Hello to you, too",
+        "hay",
+        "hey",
+        "hai",
+        "hello",
+        "wassup",
+        "hi"
+    ];
     for(let sentance of triggers1){
         if(input.txt.toLowerCase().includes(sentance)){
             var x = 0;
             if(input.txt.toLowerCase().includes("what's up")){x=12};
             if(x === 0){x =Math.floor(Math.random()*11);}
             chat(responses1[x], input.replyID);
+            return;
+        }
+    }
+     for(let sentance of triggers2){
+        if(input.txt.toLowerCase().includes(sentance)){
+            var x = 0;
+            if(x === 0){x =Math.floor(Math.random()*6);}
+            chat(responses2[x], input.replyID);
             return;
         }
     }

@@ -40,7 +40,6 @@ class Message {
 
 var name = "Bald Bantha";
 var owner = "Bald Bantha";
-var reqPing = false;
 var ignoreOwn = true;
 var modules = new Set();
 var outputOk = true;
@@ -80,9 +79,7 @@ function loop() {
     }
     var messageL = message.txt.toLowerCase();
 
-    if (reqPing && messageL.includes("@" +
-            name.toLowerCase()) != true)
-        return;
+   
     if (message.txt == prevMessage.txt){
         return;
     }
@@ -138,7 +135,12 @@ function whatThink(input){
     var triggers = [
         "what do you think of",
         "what do you think about",
-        "what are your thoughts on"
+        "what are your thoughts on",
+        "What do u think of",
+        "what do u think about",
+        "what r ur thoughts on",
+        "what are ur thoughts on",
+        "what r your thoughts on"
     ];
     var responses = [
         " is a wonderful person.",
@@ -146,7 +148,8 @@ function whatThink(input){
         " has a big ego. ",
         " is somewhere I would want to go",
         " would make a great headline!",
-        " Is wrong."
+        " is wrong.",
+        " is dumb."
     ];
     for(let sentance of triggers){ 
         if(input.txt.toLowerCase().includes(sentance)){
@@ -171,7 +174,8 @@ function greeting(input){
     var triggers2 = [
         "hello",
         "hi",
-        "hai"
+        "hai",
+        "hey"
     ];
  
     for(let sentance of triggers1){

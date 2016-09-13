@@ -1,21 +1,4 @@
 
-class Message {
-    constructor(user, txt, starNode, replyID) {
-        this.replyID = replyID;
-        this.user = user;
-        this.txt = txt;
-        this.starNode = starNode;
-    
-    }
-    star() {
-        this.starNode.click();
-        console.log("Message starred: " + this.txt);
-    }
-    toMarkdown() {
-
-    }
-
-}
 /* Copyright(c) 2016 Caleb Gentry alias epicTCK
  * Permission is hereby granted, free of charge,
  * to any person obtaining a copy  of this software
@@ -38,9 +21,25 @@ class Message {
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+class Message {
+    constructor(user, txt, starNode, replyID) {
+        this.replyID = replyID;
+        this.user = user;
+        this.txt = txt;
+        this.starNode = starNode;
+    
+    }
+    star() {
+        this.starNode.click();
+        console.log("Message starred: " + this.txt);
+    }
+    toMarkdown() {
+
+    }
+
+}
 var name = "Bald Bantha";
 var owner = "Bald Bantha";
-var ignoreOwn = true;
 var modules = new Set();
 var outputOk = true;
 
@@ -77,9 +76,7 @@ function loop() {
     var message = getMessage(1);
     var prevMessage = getMessage(2);
 
-    if (message.user == name && ignoreOwn) {
-        return;
-    }
+    
     var messageL = message.txt.toLowerCase();
 
    

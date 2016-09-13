@@ -60,7 +60,6 @@ function getMessage(number) {
     var containers = document.getElementsByClassName("monologue");
     var container = containers[containers.length - number];
     var contentClasses = container.getElementsByClassName("content");
-    console.log(contentClasses);
     var content = contentClasses[contentClasses.length - 1].innerHTML;
     var message = new Message(
         container.getElementsByClassName("username")[0].innerHTML,

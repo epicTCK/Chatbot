@@ -28,7 +28,7 @@ class Message {
         this.user = user;
         this.txt = txt;
         this.starNode = starNode;
-    
+        this.respondedTo = false;
     }
     star() {
         this.starNode.click();
@@ -37,19 +37,22 @@ class Message {
     toMarkdown() {
 
     }
-
+    reply(msg, botTag){
+        chat(msg, this.replyID, botTag);
+        this.respondedTo = true;
+    }
 }
 var name = "Bald Bantha";
 var owner = "Bald Bantha";
 var modules = new Set();
 var outputOk = true;
 
-function chat(msg, reply, botTag) {
-    reply = reply || false;
+function chat(msg, replyBool, botTag) {
+    replyBool = replyBool || false;
     botTag = botTag || true;
     if(outputOk){
     tag = botTag? "**[BOT]** ": "";
-    tag = reply? reply + " " + tag: tag;
+    tag = replyBool? replyBool + " " + tag: tag;
     document.getElementById('input').value = tag + msg.replace(/<\/?i>/g, "*").replace('<span class=\"mention\">', '').replace('</span>', '');
     document.getElementById("sayit-button").click();
     console.log("message sent: " + msg);
@@ -63,7 +66,7 @@ function getMessage(number) {//TODO faster way to get last element would be to u
     let txt = contentClasses[contentClasses.length - 1].innerHTML;
     let messageClasses = container.getElementsByClassName("message");
     let replyID = ":" + messageClasses[messageClasses.length - 1].id.split("-").pop();
-    let starClasses = getElementsByClassName("stars");
+    let starClasses = container.getElementsByClassName("stars");
     let star = starClasses[starClasses.length-1].children[0];
     let message = new Message(
         container.getElementsByClassName("username")[0].innerHTML,
@@ -104,22 +107,24 @@ function addModule(callback) {
 
 
 function xkcd(input) {
+    if(input.respondedTo)return;
     if(input.user === name)return;
     if (input.txt.includes("xkcd")) {
         var split = input.txt.split(" ");
         var num = split[split.indexOf("xkcd") + 1];
         var url = "http://www.xkcd.com/" + num;
         if (/^\d+$/.test(num)) {
-            chat(url, input.replyID, false);
+            input.reply(url, false);
         } else {
-            chat("Invalid input ", input.replyID, true ); //thnx to downgoat on PPCG chat
+            input.reply("Invalid input "); //thnx to downgoat on PPCG chat
         }
     }
 }
 function avocad(input){
+    if(input.respondedTo)return;
     if(input.user === name)return;
     if(input.txt.toLowerCase().includes("avocad")){
-        chat("https://authoritynutrition.com/wp-content/uploads/2014/09/avocado-sliced-in-half.jpg", input.replyID,false);
+        input.reply("https://authoritynutrition.com/wp-content/uploads/2014/09/avocado-sliced-in-half.jpg",false);
     }
 }
 
@@ -127,11 +132,11 @@ function admin(input){
 
     if(input.user === owner){
      if(input.txt.split(' ')[0].toLowerCase() === "/stop"){
-         chat("Standby mode activated",input.replyID, true);
+         input.reply("Standby mode activated", true);
          outputOk = false;
      }
      if(input.txt.split(' ')[0].toLowerCase() === "/start"){
-         chat("Standby mode disabled, bot is active",input.replyID, true);
+         input.reply("Standby mode disabled, bot is active",true);
          outputOk = true;
      } 
     }
@@ -139,6 +144,7 @@ function admin(input){
 }
 function whatThink(input){
     if(input.user === name)return;
+    if(input.respondedTo)return;
     var triggers = [
         "what do you think of",
         "what do you think about",
@@ -174,7 +180,7 @@ function whatThink(input){
             if(input.txt.toLowerCase().includes("avocad")){x=1;}
             if(x === 0){x =Math.floor(Math.random()*14);}
             
-           chat("I think "+  input.txt.toLowerCase().replace(sentance, "") + responses[x] ,input.replyID);
+           input.reply("I think "+  input.txt.toLowerCase().replace(sentance, "") + responses[x]);
            return;
         }
     }
@@ -182,6 +188,7 @@ function whatThink(input){
 }
 function greeting(input){
     if(input.user === name)return;
+    if(input.respondedTo)return;
     var triggers1 = [
         "what's up",
         "whats up",
@@ -189,11 +196,12 @@ function greeting(input){
         "how r u",
         "how are u",
         "how r you",
-        "what is up"
+        "what is up",
+        "wassup"
     ];
     var triggers2 = [
         "hello",
-        "hi",
+        /[^\W\d]hi[^\W\d]/,
         "hai",
         "hey"
     ];
@@ -222,19 +230,19 @@ function greeting(input){
         "hi"
     ];
     for(let sentance of triggers1){
-        if(input.txt.toLowerCase().includes(sentance)){
+        if(input.txt.toLowerCase().match(sentance)){
             var x = 0;
             if(input.txt.toLowerCase().includes("what's up")){x=12};
             if(x === 0){x =Math.floor(Math.random()*11);}
-            chat(responses1[x], input.replyID);
+            input.reply(responses1[x]);
             return;
         }
     }
      for(let sentance of triggers2){
-        if(input.txt.toLowerCase().includes(sentance)){
+        if(input.txt.toLowerCase().match(sentance)){
             var x = 0;
             if(x === 0){x =Math.floor(Math.random()*6);}
-            chat(responses2[x], input.replyID);
+            input.reply(responses2[x]);
             return;
         }
     }

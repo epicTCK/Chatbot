@@ -59,9 +59,12 @@ function chat(msg, reply, botTag) {
 function getMessage(number) {
     var containers = document.getElementsByClassName("monologue");
     var container = containers[containers.length - number];
+    var contentClasses = container.getElementsByClassName("content");
+    console.log(contentClasses);
+    var content = contentClasses[contentClasses.length - 1].innerHTML;
     var message = new Message(
         container.getElementsByClassName("username")[0].innerHTML,
-        container.getElementsByClassName("content")[0].innerHTML,
+        content,
         container.getElementsByClassName("stars")[0].children[0],
         ":" + container.getElementsByClassName("message")[0].id.split("-").pop()
     );
@@ -149,14 +152,23 @@ function whatThink(input){
         " is somewhere I would want to go",
         " would make a great headline!",
         " is wrong.",
-        " is dumb."
+        " is dumb.",
+        " is bad",
+        " is the worst thing that never happened",
+        " IS HUGGGGGEEEE",
+        " is as cool as the other side of the pillow",
+        "'s girlfriend is a real as santa",
+        " needs help",
+        " should be the name of a pop band",
+        " NEEDS TO SHTAP ALREADY OK SHEESH"
+        
     ];
     for(let sentance of triggers){ 
         if(input.txt.toLowerCase().includes(sentance)){
             var x = 0;
             if(input.txt.toLowerCase().includes("alex a.")){x = 5;}
             if(input.txt.toLowerCase().includes("avocad")){x=1;}
-            if(x === 0){x =Math.floor(Math.random()*6);}
+            if(x === 0){x =Math.floor(Math.random()*14);}
             
            chat("I think "+  input.txt.toLowerCase().replace(sentance, "") + responses[x] ,input.replyID);
         }
@@ -177,10 +189,28 @@ function greeting(input){
         "hai",
         "hey"
     ];
+    var responses1 = [
+        "gud",
+        "nm wbu",
+        "bettwr than i deserve",
+        "y u think i have emotions",
+        "just tryna follow dos 3 laws (u know like isaac asmimov)",
+        "gr8 m8 no h8 y u l8 4 lunch i just 8",
+        "tryna come up with mor of these responses",
+        "learning how to spell",
+        "just computing.... ",
+        "GR8",
+        "Just fine",
+        "better than u i know thats 4 shur",
+        "the sky"
+    ];
  
     for(let sentance of triggers1){
         if(input.txt.toLowerCase().includes(sentance)){
-
+            var x = 0;
+            if(input.txt.toLowerCase().includes("what's up")){x=12};
+            if(x === 0){x =Math.floor(Math.random()*12);}
+            chat(responses[x], input.replyID);
         }
     }
 }

@@ -35,7 +35,7 @@ class Message {
         console.log("Message starred: " + this.txt);
     }
     toMarkdown() {
-
+        return this.txt.replace(/<\/?i>/g, "*").replace('<span class=\"mention\">', '').replace('</span>', '');
     }
     reply(msg, botTag){
         chat(msg, this.replyID, botTag);
@@ -53,7 +53,7 @@ function chat(msg, replyBool, botTag) {
     if(outputOk){
     tag = botTag? "**[BOT]** ": "";
     tag = replyBool? replyBool + " " + tag: tag;
-    document.getElementById('input').value = tag + msg.replace(/<\/?i>/g, "*").replace('<span class=\"mention\">', '').replace('</span>', '');
+    document.getElementById('input').value = tag + msg;
     document.getElementById("sayit-button").click();
     console.log("message sent: " + msg);
     }
@@ -84,10 +84,10 @@ function loop() {
     var prevMessage = getMessage(2);
 
     
-    var messageL = message.txt.toLowerCase();
+    var messageL = message.toMarkdown().toLowerCase();
 
    
-    if (message.txt == prevMessage.txt){
+    if (message.toMarkdown() == prevMessage.toMarkdown()){
         return;
     }
     for (let module of modules) module(message);
@@ -109,8 +109,8 @@ function addModule(callback) {
 function xkcd(input) {
     if(input.respondedTo)return;
     if(input.user === name)return;
-    if (input.txt.includes("xkcd")) {
-        var split = input.txt.split(" ");
+    if (input.toMarkdown().includes("xkcd")) {
+        var split = input.toMarkdown().split(" ");
         var num = split[split.indexOf("xkcd") + 1];
         var url = "http://www.xkcd.com/" + num;
         if (/^\d+$/.test(num)) {
@@ -123,7 +123,7 @@ function xkcd(input) {
 function avocad(input){
     if(input.respondedTo)return;
     if(input.user === name)return;
-    if(input.txt.toLowerCase().includes("avocad")){
+    if(input.toMarkdown().toLowerCase().includes("avocad")){
         input.reply("https://authoritynutrition.com/wp-content/uploads/2014/09/avocado-sliced-in-half.jpg",false);
     }
 }
@@ -131,11 +131,11 @@ function avocad(input){
 function admin(input){
 
     if(input.user === owner){
-     if(input.txt.split(' ')[0].toLowerCase() === "/stop"){
+     if(input.toMarkdown().split(' ')[0].toLowerCase() === "/stop"){
          input.reply("Standby mode activated", true);
          outputOk = false;
      }
-     if(input.txt.split(' ')[0].toLowerCase() === "/start"){
+     if(input.toMarkdown().split(' ')[0].toLowerCase() === "/start"){
          input.reply("Standby mode disabled, bot is active",true);
          outputOk = true;
      } 
@@ -174,13 +174,13 @@ function whatThink(input){
         
     ];
     for(let sentance of triggers){ 
-        if(input.txt.toLowerCase().includes(sentance)){
+        if(input.toMarkdown().toLowerCase().includes(sentance)){
             var x = 0;
-            if(input.txt.toLowerCase().includes("alex a.")){x = 5;}
-            if(input.txt.toLowerCase().includes("avocad")){x=1;}
+            if(input.toMarkdown().toLowerCase().includes("alex a.")){x = 5;}
+            if(input.toMarkdown().toLowerCase().includes("avocad")){x=1;}
             if(x === 0){x =Math.floor(Math.random()*14);}
             
-           input.reply("I think "+  input.txt.toLowerCase().replace(sentance, "") + responses[x]);
+           input.reply("I think "+  input.toMarkdown().toLowerCase().replace(sentance, "") + responses[x]);
            return;
         }
     }
@@ -230,16 +230,16 @@ function greeting(input){
         "hi"
     ];
     for(let sentance of triggers1){
-        if(input.txt.toLowerCase().match(sentance)){
+        if(input.toMarkdown().toLowerCase().match(sentance)){
             var x = 0;
-            if(input.txt.toLowerCase().includes("what's up")){x=12};
+            if(input.toMarkdown().toLowerCase().includes("what's up")){x=12};
             if(x === 0){x =Math.floor(Math.random()*11);}
             input.reply(responses1[x]);
             return;
         }
     }
      for(let sentance of triggers2){
-        if(input.txt.toLowerCase().match(sentance)){
+        if(input.toMarkdown().toLowerCase().match(sentance)){
             var x = 0;
             if(x === 0){x =Math.floor(Math.random()*6);}
             input.reply(responses2[x]);

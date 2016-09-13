@@ -50,6 +50,7 @@ function chat(msg, reply, botTag) {
     botTag = botTag || true;
     if(outputOk){
     tag = botTag? "**[BOT]** ": "";
+    tag = reply? reply + " " + tag: tag;
     document.getElementById('input').value = tag + msg.replace(/<\/?i>/g, "*").replace('<span class=\"mention\">', '').replace('</span>', '');
     document.getElementById("sayit-button").click();
     console.log("message sent: " + msg);
@@ -134,7 +135,7 @@ function admin(input){
     
 }
 function whatThink(input){
-    var sentances = [
+    var triggers = [
         "what do you think of",
         "what do you think about",
         "what are your thoughts on"
@@ -147,7 +148,7 @@ function whatThink(input){
         " would make a great headline!",
         " Is wrong."
     ];
-    for(let sentance of sentances){ 
+    for(let sentance of triggers){ 
         if(input.txt.toLowerCase().includes(sentance)){
             var x = 0;
             if(input.txt.toLowerCase().includes("alex a.")){x = 5;}
@@ -159,8 +160,27 @@ function whatThink(input){
     }
 }
 function greeting(input){
-    
+    var triggers1 = [
+        "what's up",
+        "whats up",
+        "how are you",
+        "how r u",
+        "how are u",
+        "how r you"
+    ];
+    var triggers2 = [
+        "hello",
+        "hi",
+        "hai"
+    ];
+ 
+    for(let sentance of triggers1){
+        if(input.txt.toLowerCase().includes(sentance)){
+
+        }
+    }
 }
+
 addModule(avocad);
 addModule(xkcd);
 addModule(admin);

@@ -56,16 +56,20 @@ function chat(msg, reply, botTag) {
     }
 }
 
-function getMessage(number) {
-    var containers = document.getElementsByClassName("monologue");
-    var container = containers[containers.length - number];
-    var contentClasses = container.getElementsByClassName("content");
-    var content = contentClasses[contentClasses.length - 1].innerHTML;
-    var message = new Message(
+function getMessage(number) {//TODO faster way to get last element would be to use array.pop()
+    let containers = document.getElementsByClassName("monologue");
+    let container = containers[containers.length - number];
+    let contentClasses = container.getElementsByClassName("content");
+    let txt = contentClasses[contentClasses.length - 1].innerHTML;
+    let messageClasses = container.getElementsByClassName("message");
+    let replyID = ":" + messageClasses[messageClasses.length - 1].id.split("-").pop();
+    let starClasses = getElementsByClassName("stars");
+    let star = starClasses[starClasses.length-1].children[0];
+    let message = new Message(
         container.getElementsByClassName("username")[0].innerHTML,
-        content,
-        container.getElementsByClassName("stars")[0].children[0],
-        ":" + container.getElementsByClassName("message")[0].id.split("-").pop()
+        txt,
+        star,
+        replyID
     );
   
     return message;
@@ -171,6 +175,7 @@ function whatThink(input){
             if(x === 0){x =Math.floor(Math.random()*14);}
             
            chat("I think "+  input.txt.toLowerCase().replace(sentance, "") + responses[x] ,input.replyID);
+           return;
         }
     }
 }
@@ -182,7 +187,8 @@ function greeting(input){
         "how are you",
         "how r u",
         "how are u",
-        "how r you"
+        "how r you",
+        "what is up"
     ];
     var triggers2 = [
         "hello",
@@ -210,8 +216,9 @@ function greeting(input){
         if(input.txt.toLowerCase().includes(sentance)){
             var x = 0;
             if(input.txt.toLowerCase().includes("what's up")){x=12};
-            if(x === 0){x =Math.floor(Math.random()*12);}
-            chat(responses[x], input.replyID);
+            if(x === 0){x =Math.floor(Math.random()*11);}
+            chat(responses1[x], input.replyID);
+            return;
         }
     }
 }

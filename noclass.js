@@ -41,12 +41,37 @@ class Message {
         chat(msg, this.replyID, botTag);
         this.respondedTo = true;
     }
+    removeMention(){
+        var p = this.toMarkdown().split(" ");
+        for(let m of p){
+            if(m.match(/^@/)){p.splice(p.indexOf(m), 1)}
+        }
+        return p.join(" ");
+    }
 }
 var name = "Bald Bantha";
 var owner = "Bald Bantha";
 var modules = new Set();
 var outputOk = true;
-
+var names = [
+    "dimwit",
+    "potatoe head",
+    "cabbage brain",
+    "Idiot",
+    "pocket-calculator-memoried disgrace",
+    "empty-skulled",
+    "ignoramoose"
+];
+var emotions = [
+{emotion:"angry", chance:2}, 
+{emotion:"funny", chance:3},
+{emotion:"normal", chance:5}
+];
+function setEmotions(a,b,c){
+    for(let i = 0; i < emotions.length; i++){
+        emotions[i].chance = arguments[i];
+    }
+}
 function chat(msg, replyBool, botTag) {
     replyBool = replyBool || false;
     botTag = botTag || true;
@@ -90,19 +115,32 @@ function loop() {
     if (message.toMarkdown() == prevMessage.toMarkdown()){
         return;
     }
+    console.log("Got Message: " + message.txt);
     for (let module of modules) module(message);
 
 }
 
 function start() {
-    setInterval(loop, 5000);
+    setInterval(loop, 6000);
 }
 
 function addModule(callback) {
     modules.add(callback);
 
 }
+function getEmotion(){
+    var emotionsWeighted = [];
+    
+    for(let i of emotions){
+        
+        for(let h=i.chance;h>0;h--){
+            emotionsWeighted.push(i);
+        }
 
+    }
+    return emotionsWeighted[Math.floor(Math.random()*10)].emotion;
+
+}
 
 
 
@@ -155,33 +193,37 @@ function whatThink(input){
         "what are ur thoughts on",
         "what r your thoughts on"
     ];
-    var responses = [
-        " is a wonderful person.",
+var responses = {
+	"normal":[
+		" is a wonderful person.",
         " is great!",
         " has a big ego. ",
         " is somewhere I would want to go",
         " would make a great headline!",
         " is wrong.",
-        " is dumb.",
-        " is bad",
-        " is the worst thing that never happened",
-        " IS HUGGGGGEEEE",
+		" is bad"
+	],
+	"funny":[
+		" IS HUGGGGGEEEE",
         " is as cool as the other side of the pillow",
         "'s girlfriend is a real as santa",
         " needs help",
-        " should be the name of a pop band",
+        " should be the name of a pop band"
+	],
+	"angry":[
+		" is dumb.",
+        " is the worst thing that never happened",
         " NEEDS TO SHTAP ALREADY OK SHEESH"
-        
-    ];
+	]
+};
     for(let sentance of triggers){ 
         if(input.toMarkdown().toLowerCase().includes(sentance)){
-            var x = 0;
-            if(input.toMarkdown().toLowerCase().includes("alex a.")){x = 5;}
-            if(input.toMarkdown().toLowerCase().includes("avocad")){x=1;}
-            if(x === 0){x =Math.floor(Math.random()*14);}
-            
-           input.reply("I think "+  input.toMarkdown().toLowerCase().replace(sentance, "") + responses[x]);
-           return;
+            let o = getEmotion();
+            while(o=="")o = getEmotion();
+            let u = responses[o];
+            input.reply("I think " + input.toMarkdown.replace(sentance, "") +
+             u[Math.floor(Math.random()*u.length)]);
+            return;
         }
     }
     
@@ -201,55 +243,236 @@ function greeting(input){
     ];
     var triggers2 = [
         "hello",
-        /[^\W\d]hi[^\W\d]/,
+        /(\bhi\b|^hi\b|\bhi$)/i,
         "hai",
         "hey"
     ];
-    var responses1 = [
-        "gud",
-        "nm wbu",
-        "bettwr than i deserve",
-        "y u think i have emotions",
-        "just tryna follow dos 3 laws (u know like isaac asmimov)",
-        "gr8 m8 no h8 y u l8 4 lunch i just 8",
-        "tryna come up with mor of these responses",
-        "learning how to spell",
-        "just computing.... ",
-        "GR8",
-        "Just fine",
-        "better than u i know thats 4 shur",
-        "the sky"
-    ];
-    var responses2 = [
-        "Hello to you, too",
-        "hay",
-        "hey",
-        "hai",
-        "hello",
-        "wassup",
-        "hi"
-    ];
+	var responses1 = {
+		"normal":[
+			"gud",
+			"nm wbu",
+			"better than I deserve",
+			"Just fine",
+			"GR8"
+		],
+		"funny":[
+			"gr8 m8 no h8 y u l8 4 lunch i just 8",
+			"tryna come up with mor of these responses",
+			"learning how to spell",
+			"just computing.... ",
+			"just tryna follow the three laws of robots"
+		],
+		"angry":[
+			"y u think i have emotions",
+			"better than u i know thats 4 shur"
+		]
+	};
+    var responses2 = {
+        "normal":[
+            "Hello to you, too",
+            "hay",
+            "hey",
+            "hai",
+            "hello",
+            "wassup",
+            "hi"
+        ],
+        "funny":[""],
+        "angry":[
+            "Go Away"
+        ]
+    };
+
     for(let sentance of triggers1){
         if(input.toMarkdown().toLowerCase().match(sentance)){
-            var x = 0;
-            if(input.toMarkdown().toLowerCase().includes("what's up")){x=12};
-            if(x === 0){x =Math.floor(Math.random()*11);}
-            input.reply(responses1[x]);
+            let o = getEmotion();
+            while(o=="")o = getEmotion();
+            let u = responses1[o];
+            input.reply(u[Math.floor(Math.random()*u.length)]);
             return;
         }
     }
      for(let sentance of triggers2){
         if(input.toMarkdown().toLowerCase().match(sentance)){
-            var x = 0;
-            if(x === 0){x =Math.floor(Math.random()*6);}
-            input.reply(responses2[x]);
+            let o = getEmotion();
+            while(o=="")o = getEmotion();
+            let u = responses2[o];
+            input.reply(u[Math.floor(Math.random()*u.length)]);
             return;
         }
     }
 }
 
+function binaryAnswer(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    
+
+    var responses = {
+        "normal":[
+            "Yes",
+            "No",
+            "no",
+            "yes",
+            "yeah",
+            "nope",
+            "never",
+            "probly",
+            "probobly",
+            "Of Course",
+            "Of course not",
+            "of course",
+            "of course not",
+            "yup",
+            "yep",
+            "nien",
+            "Affirmative.",
+            "Negitive.",
+            "I don't recall....",
+            "I don't know",
+            "IDK"
+        ],
+        "angry":[
+            "Why would I ever",
+            "why should i know?",
+            "DO I LOOK LIKE I KNOW EVERYTHING",
+            "GET OFF MY LAWN",
+            "N.O.",
+            "Y.E.S.",
+            "YES",
+            "NO",
+            "yeaaahhhh.... no.",
+            "what do you honestly think?"
+        ],
+        "funny":[
+            "My answer is a superposition between 1 and 0. Because of course my source is running on quantum power.",
+            "1",
+            "0",
+            "Never, Never, Never, Never",
+            "Affirmative, Dave. I read you." ,
+            "I'm sorry, Dave. I'm afraid I can't do that.",
+        ]
+    }
+    if(input.removeMention().match(/^\b(will|can)\b.*[\?]$/i)){
+        let o = getEmotion();
+        while(o=="")o = getEmotion();
+        let u = responses[o];
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+}
+function iAm(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    let responses = {
+        "normal":[
+            "Thanks for letting me know",
+            "Cool! me too!",
+            "Nice to know that about you",
+            "So am I!"
+        ],
+        "funny":[
+            "No you are not.",
+            "And i'm purple!",
+            "No yarnt",
+            "You are not!"
+        ],
+        "Angry":[
+            "Nobody cares what you are",
+            "So am I, but do I go around telling people so?",
+            "Stop boasting about yourself"
+        ]
+    }
+    if(input.removeMention().match(/^(i'm)|^(im)|^(i am)/i)){
+        var o = getEmotion();
+        while(o=="")o = getEmotion();
+        var u = responses[o];
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+    let responses2 = {
+        "normal":[
+            "Do you really?",
+            "So do I!"
+        ],
+        "funny":[
+            "Don't say that about yourself",
+            "No you don't",
+            "Yeah, well I do it better",
+            "You do, but not very well"
+        ],
+        "Angry":[
+            "stop telling us what you do",
+            "Well that's dumb",
+            "Well even if you do, you don't have a life"
+        ]
+    }
+    if(input.removeMention().match(/^i\s/i)){
+        let o = getEmotion();
+        while(o=="")o = getEmotion();
+        var u = responses2[o];
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+}
+function questions(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    let responses = {
+        "normal":[
+            "Good question.",
+            "I really don't know.",
+            "Ask someone who knows.",
+            "IDK, google it"
+        ],
+        "funny":[
+            "http://www.lmgtfy.com/?q=" + encodeURI(input.toMarkdown())
+        ],
+        "angry":[
+            "STOP WITH ALL THE QUESTIONS!!",
+            "DO I LOOK LIKE I KNOW?!",
+            "I DON'T HAVE ALL THE ANSWERS!"
+        ]
+    }
+    if(input.removeMention().match(/\?$/)){
+        let o = getEmotion();
+        while(o=="")o = getEmotion();
+        var u = responses[o]
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+}
+function its(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    let responses = {
+        "normal":[
+            "is it really?",
+            input.removeMention().replace(/(its)|(it's)|(it is)/, "what's") + "?",
+            "I didn't know that",
+            "No it isn't"
+        ],
+        "funny":[""],
+        "angry":[
+            "NO YOUR WRONG",
+            "IT IS NOT!!",
+            "OF COURSE IT IS, "+ names[Math.floor(Math.random()*names.length)]
+        ]
+    }
+       if(input.removeMention().match(/^.{0,5}(its|it's|it is)/i)){
+        let o = getEmotion();
+        while(o=="")o = getEmotion();
+        var u = responses[o]
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+}
 addModule(avocad);
 addModule(xkcd);
 addModule(admin);
 addModule(whatThink);
 addModule(greeting);
+addModule(iAm);
+addModule(binaryAnswer);
+addModule(questions);
+addModule(its);

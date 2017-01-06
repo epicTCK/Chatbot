@@ -20,7 +20,18 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT  OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
+class Room {
+    constructor(){
+        this.name = document.getElementById("roomname").innerHTML;
+        this.desc = document.getElementById("roomdesc").innerHTML;
+        this.users = [];
+    }
+    updateUsers(){
+        for(let i in document.getElementsByClassName("user-gravatar32")){
+            this.users.push(i.title);
+        }
+    }
+}
 
 class Message {
     constructor(user, txt, starNode, replyID) {
@@ -52,6 +63,7 @@ class Message {
 var name = "Bald Bantha";
 var owner = "Bald Bantha";
 var modules = new Set();
+var room = new Room();
 var outputOk = true;
 var names = [
     "dimwit",
@@ -63,9 +75,9 @@ var names = [
     "ignoramoose"
 ];
 var emotions = [
-{emotion:"angry", chance:2}, 
+{emotion:"angry", chance:4}, 
 {emotion:"funny", chance:3},
-{emotion:"normal", chance:5}
+{emotion:"normal", chance:3}
 ];
 function setEmotions(a,b,c){
     for(let i = 0; i < emotions.length; i++){
@@ -74,7 +86,7 @@ function setEmotions(a,b,c){
 }
 function chat(msg, replyBool, botTag) {
     replyBool = replyBool || false;
-    botTag = botTag || true;
+    botTag = botTag || false;
     if(outputOk){
     tag = botTag? "**[BOT]** ": "";
     tag = replyBool? replyBool + " " + tag: tag;
@@ -103,8 +115,8 @@ function getMessage(number) {//TODO faster way to get last element would be to u
     return message;
 }
 
-function loop() {
-
+function update() {
+    room.updateUsers();
     var message = getMessage(1);
     var prevMessage = getMessage(2);
 
@@ -121,7 +133,10 @@ function loop() {
 }
 
 function start() {
-    setInterval(loop, 6000);
+    setInterval(update, 15000);
+    let nlpScript = document.createElement("script");
+    nlpScript.src="https://npmcdn.com/nlp_compromise@latest/builds/nlp_compromise.min.js";
+    document.getElementsByTagName("head")[0].appendChild(nlpScript);
 }
 
 function addModule(callback) {
@@ -221,7 +236,7 @@ var responses = {
             let o = getEmotion();
             while(o=="")o = getEmotion();
             let u = responses[o];
-            input.reply("I think " + input.toMarkdown.replace(sentance, "") +
+            input.reply("I think " + input.toMarkdown().toLowerCase().replace(sentance, "").replace("?", "") +
              u[Math.floor(Math.random()*u.length)]);
             return;
         }
@@ -345,7 +360,7 @@ function binaryAnswer(input){
             "what do you honestly think?"
         ],
         "funny":[
-            "My answer is a superposition between 1 and 0. Because of course my source is running on quantum power.",
+            "My answer is a superposition between 1 and 0.",
             "1",
             "0",
             "Never, Never, Never, Never",
@@ -377,7 +392,7 @@ function iAm(input){
             "No yarnt",
             "You are not!"
         ],
-        "Angry":[
+        "angry":[
             "Nobody cares what you are",
             "So am I, but do I go around telling people so?",
             "Stop boasting about yourself"
@@ -401,7 +416,7 @@ function iAm(input){
             "Yeah, well I do it better",
             "You do, but not very well"
         ],
-        "Angry":[
+        "angry":[
             "stop telling us what you do",
             "Well that's dumb",
             "Well even if you do, you don't have a life"
@@ -426,7 +441,7 @@ function questions(input){
             "IDK, google it"
         ],
         "funny":[
-            "http://www.lmgtfy.com/?q=" + encodeURI(input.toMarkdown())
+        "ask someone who knows"
         ],
         "angry":[
             "STOP WITH ALL THE QUESTIONS!!",
@@ -459,7 +474,7 @@ function its(input){
             "OF COURSE IT IS, "+ names[Math.floor(Math.random()*names.length)]
         ]
     }
-       if(input.removeMention().match(/^.{0,5}(its|it's|it is)/i)){
+    if(input.removeMention().match(/^.{0,5}(its|it's|it is)/i)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses[o]
@@ -467,12 +482,65 @@ function its(input){
         return;
     }
 }
+function who(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    var responses = {
+        "normal":[
+            "you",
+            "me",
+            "Who else?"
+        ],
+        "funny":room.users,
+        "angry":["YOUR MOMMA BOI"]
+    }
+    if(input.removeMention().match(/(^who|[\!\?\.]\swho)\b(?=.*(?=\?))/i)){
+        let o = getEmotion();
+        while(o=="")o = getEmotion();
+        var u = responses[o]
+        input.reply(u[Math.floor(Math.random()*u.length)]);
+        return;
+    }
+}
+function statement(input){
+    if(input.user === name)return;
+    if(input.respondedTo)return;
+    
+    let x = nlp_compromise.text(input.removeMention().split(/\.\?\!/)[0]);
+    
+    switch(Math.floor(Math.random()*6)){
+        case 0:
+            input.reply("No, " + x.negate().text());
+            break;
+        case 1:
+            input.reply("No, " + x.to_past().text());
+            break;
+        case 2:
+            input.reply("No, " + x.to_future().text());
+            break;
+        case 3:
+            input.reply("No, " + x.replace("[Noun]", "Deez Nuts").text());
+            break;
+        case 4:
+            input.reply("No, " + x.replace("[Verb]", "exterminate").text());
+            break;
+        case 5:
+            input.reply("No, " + x.replace("[Noun]", "avocado").text());
+            break;
+    }
+    
+    
+}
+//add in order of priority
 addModule(avocad);
 addModule(xkcd);
 addModule(admin);
 addModule(whatThink);
 addModule(greeting);
 addModule(iAm);
+addModule(who);
 addModule(binaryAnswer);
 addModule(questions);
 addModule(its);
+addModule(statement);
+start();

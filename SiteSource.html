@@ -1,10 +1,31 @@
+<head>
 <!--Next 5 lines from https://github.com/joshbuchea/HEAD#recommended-minimum -->
 <meta charset="utf-8">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 <title>Chatbot</title>
+<script src="https://npmcdn.com/nlp_compromise@latest/builds/nlp_compromise.min.js"></script>
+ <style type ="text/css" >
 
+   footer{ 
+       position: fixed;     
+       text-align: center;    
+       bottom: 0px; 
+       width: 100%;
+   }  
+   #user{
+       background-color: lightskyblue;
+       text-align: right;
+       padding:5px;
+   }
+   #bot{
+       padding:5px;
+   }
+
+</style>
+</head>
+<body id="body">
 <script>
 /* Copyright(c) 2016 Caleb Gentry alias epicTCK
  * Permission is hereby granted, free of charge,
@@ -28,47 +49,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class Message {
-    constructor(user, txt, starNode, replyID) {
-        this.replyID = replyID;
-        this.user = user;
-        this.txt = txt;
-        this.starNode = starNode;
-        this.respondedTo = false;
-    }
-    star() {
-        this.starNode.click();
-        console.log("Message starred: " + this.txt);
-    }
-    toMarkdown() {
-        return this.txt.replace(/<\/?i>/g, "*").replace('<span class=\"mention\">', '').replace('</span>', '');
-    }
-    reply(msg, botTag){
-        chat(msg, this.replyID, botTag);
-        this.respondedTo = true;
-    }
-    removeMention(){
-        var p = this.toMarkdown().split(" ");
-        for(let m of p){
-            if(m.match(/^@/)){p.splice(p.indexOf(m), 1)}
-        }
-        return p.join(" ");
-    }
-}
-var name = "Bald Bantha";
-var owner = "Bald Bantha";
+/*TODO: make the bot into a class/object, and then site-specific code
+ (Like getting it to work on IRC, personal website chatroom, and SE chat), is built outside of the
+ bot class
+ */
+/*TODO: Beautify*/
 var modules = new Set();
-var room = new Room();
-var outputOk = true;
-var names = [
-    "dimwit",
-    "potatoe head",
-    "cabbage brain",
-    "Idiot",
-    "pocket-calculator-memoried disgrace",
-    "empty-skulled",
-    "ignoramoose"
-];
+var replied = false;
 var emotions = [
 {emotion:"angry", chance:4}, 
 {emotion:"funny", chance:3},
@@ -79,64 +66,32 @@ function setEmotions(a,b,c){
         emotions[i].chance = arguments[i];
     }
 }
-function chat(msg, replyBool, botTag) {
-    replyBool = replyBool || false;
-    botTag = botTag || false;
-    if(outputOk){
-    tag = botTag? "**[BOT]** ": "";
-    tag = replyBool? replyBool + " " + tag: tag;
-    document.getElementById('input').value = tag + msg;
-    document.getElementById("sayit-button").click();
+function addMsg(msg, from){
+    var messageP = document.createElement("div");
+    var textNode = document.createTextNode(msg);
+    messageP.id = from;
+    messageP.appendChild(textNode);
+    document.getElementById("body").appendChild(messageP);
+}
+function chat(msg) {
+    if(!replied){
+    addMsg(msg, "bot");
     console.log("message sent: " + msg);
+    replied = true;
     }
 }
-
-function getMessage(number) {//TODO faster way to get last element would be to use array.pop()
-    let containers = document.getElementsByClassName("monologue");
-    let container = containers[containers.length - number];
-    let contentClasses = container.getElementsByClassName("content");
-    let txt = contentClasses[contentClasses.length - 1].innerHTML;
-    let messageClasses = container.getElementsByClassName("message");
-    let replyID = ":" + messageClasses[messageClasses.length - 1].id.split("-").pop();
-    let starClasses = container.getElementsByClassName("stars");
-    let star = starClasses[starClasses.length-1].children[0];
-    let message = new Message(
-        container.getElementsByClassName("username")[0].innerHTML,
-        txt,
-        star,
-        replyID
-    );
-  
-    return message;
-}
-
-function update() {
-    room.updateUsers();
-    var message = getMessage(1);
-    var prevMessage = getMessage(2);
-
-    
-    var messageL = message.toMarkdown().toLowerCase();
-
-   
-    if (message.toMarkdown() == prevMessage.toMarkdown()){
-        return;
-    }
-    console.log("Got Message: " + message.txt);
+function onMessage() {
+    var txtbox = document.getElementById("textbox");
+    var message = txtbox.value;
+    txtbox.value = "";
+    addMsg(message, "user");
+    replied = false;
     for (let module of modules) module(message);
-
 }
 
-function start() {
-    setInterval(update, 15000);
-    let nlpScript = document.createElement("script");
-    nlpScript.src="https://npmcdn.com/nlp_compromise@latest/builds/nlp_compromise.min.js";
-    document.getElementsByTagName("head")[0].appendChild(nlpScript);
-}
 
 function addModule(callback) {
     modules.add(callback);
-
 }
 function getEmotion(){
     var emotionsWeighted = [];
@@ -149,50 +104,8 @@ function getEmotion(){
 
     }
     return emotionsWeighted[Math.floor(Math.random()*10)].emotion;
-
-}
-
-
-
-function xkcd(input) {
-    if(input.respondedTo)return;
-    if(input.user === name)return;
-    if (input.toMarkdown().includes("xkcd")) {
-        var split = input.toMarkdown().split(" ");
-        var num = split[split.indexOf("xkcd") + 1];
-        var url = "http://www.xkcd.com/" + num;
-        if (/^\d+$/.test(num)) {
-            input.reply(url, false);
-        } else {
-            input.reply("Invalid input "); //thnx to downgoat on PPCG chat
-        }
-    }
-}
-function avocad(input){
-    if(input.respondedTo)return;
-    if(input.user === name)return;
-    if(input.toMarkdown().toLowerCase().includes("avocad")){
-        input.reply("https://authoritynutrition.com/wp-content/uploads/2014/09/avocado-sliced-in-half.jpg",false);
-    }
-}
-
-function admin(input){
-
-    if(input.user === owner){
-     if(input.toMarkdown().split(' ')[0].toLowerCase() === "/stop"){
-         input.reply("Standby mode activated", true);
-         outputOk = false;
-     }
-     if(input.toMarkdown().split(' ')[0].toLowerCase() === "/start"){
-         input.reply("Standby mode disabled, bot is active",true);
-         outputOk = true;
-     } 
-    }
-    
 }
 function whatThink(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     var triggers = [
         "what do you think of",
         "what do you think about",
@@ -227,20 +140,18 @@ var responses = {
 	]
 };
     for(let sentance of triggers){ 
-        if(input.toMarkdown().toLowerCase().includes(sentance)){
+        if(input.toLowerCase().includes(sentance)){
             let o = getEmotion();
             while(o=="")o = getEmotion();
             let u = responses[o];
-            input.reply("I think " + input.toMarkdown().toLowerCase().replace(sentance, "").replace("?", "") +
+            chat("I think " + input.toLowerCase().replace(sentance, "").replace("?", "") +
              u[Math.floor(Math.random()*u.length)]);
             return;
         }
     }
     
 }
-function greeting(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
+function greeting(input){;
     var triggers1 = [
         "what's up",
         "whats up",
@@ -287,36 +198,34 @@ function greeting(input){
             "wassup",
             "hi"
         ],
-        "funny":[""],
+        "funny":["Ummm.. hi"],
         "angry":[
             "Go Away"
         ]
     };
 
     for(let sentance of triggers1){
-        if(input.toMarkdown().toLowerCase().match(sentance)){
+        if(input.toLowerCase().match(sentance)){
             let o = getEmotion();
             while(o=="")o = getEmotion();
             let u = responses1[o];
-            input.reply(u[Math.floor(Math.random()*u.length)]);
+            chat(u[Math.floor(Math.random()*u.length)]);
             return;
         }
     }
      for(let sentance of triggers2){
-        if(input.toMarkdown().toLowerCase().match(sentance)){
+        if(input.toLowerCase().match(sentance)){
             let o = getEmotion();
             while(o=="")o = getEmotion();
             let u = responses2[o];
-            input.reply(u[Math.floor(Math.random()*u.length)]);
+            chat(u[Math.floor(Math.random()*u.length)]);
             return;
         }
     }
 }
 
 function binaryAnswer(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
-    
+
 
     var responses = {
         "normal":[
@@ -363,17 +272,15 @@ function binaryAnswer(input){
             "I'm sorry, Dave. I'm afraid I can't do that.",
         ]
     }
-    if(input.removeMention().match(/^\b(will|can)\b.*[\?]$/i)){
+    if(input.match(/^\b(will|can|are|is)\b.*[\?]$/i)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         let u = responses[o];
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
 }
 function iAm(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     let responses = {
         "normal":[
             "Thanks for letting me know",
@@ -393,11 +300,11 @@ function iAm(input){
             "Stop boasting about yourself"
         ]
     }
-    if(input.removeMention().match(/^(i'm)|^(im)|^(i am)/i)){
+    if(input.match(/^(i'm)|^(im)|^(i am)/i)){
         var o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses[o];
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
     let responses2 = {
@@ -417,17 +324,15 @@ function iAm(input){
             "Well even if you do, you don't have a life"
         ]
     }
-    if(input.removeMention().match(/^i\s/i)){
+    if(input.match(/^i\s/i)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses2[o];
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
 }
 function questions(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     let responses = {
         "normal":[
             "Good question.",
@@ -444,42 +349,37 @@ function questions(input){
             "I DON'T HAVE ALL THE ANSWERS!"
         ]
     }
-    if(input.removeMention().match(/\?$/)){
+    if(input.match(/\?$/)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses[o]
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
 }
 function its(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     let responses = {
         "normal":[
             "is it really?",
-            input.removeMention().replace(/(its)|(it's)|(it is)/, "what's") + "?",
+            input.replace(/(its)|(it's)|(it is)/, "what's") + "?",
             "I didn't know that",
             "No it isn't"
         ],
         "funny":[""],
         "angry":[
             "NO YOUR WRONG",
-            "IT IS NOT!!",
-            "OF COURSE IT IS, "+ names[Math.floor(Math.random()*names.length)]
+            "IT IS NOT!!"
         ]
     }
-    if(input.removeMention().match(/^.{0,5}(its|it's|it is)/i)){
+    if(input.match(/^.{0,5}(its|it's|it is)/i)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses[o]
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
 }
 function who(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     var responses = {
         "normal":[
             "you",
@@ -489,54 +389,44 @@ function who(input){
         "funny":room.users,
         "angry":["YOUR MOMMA BOI"]
     }
-    if(input.removeMention().match(/(^who|[\!\?\.]\swho)\b(?=.*(?=\?))/i)){
+    if(input.match(/(^who|[\!\?\.]\swho)\b(?=.*(?=\?))/i)){
         let o = getEmotion();
         while(o=="")o = getEmotion();
         var u = responses[o]
-        input.reply(u[Math.floor(Math.random()*u.length)]);
+        chat(u[Math.floor(Math.random()*u.length)]);
         return;
     }
 }
 function statement(input){
-    if(input.user === name)return;
-    if(input.respondedTo)return;
     
-    let x = nlp_compromise.text(input.removeMention().split(/\.\?\!/)[0]);
+    let x = nlp_compromise.text(input.split(/\.\?\!/)[0]);
     
-    switch(Math.floor(Math.random()*6)){
+    switch(Math.floor(Math.random()*3)){
         case 0:
-            input.reply("No, " + x.negate().text());
+            chat("No, " + x.negate().text());
             break;
         case 1:
-            input.reply("No, " + x.to_past().text());
+            chat("No, " + x.to_past().text());
             break;
         case 2:
-            input.reply("No, " + x.to_future().text());
-            break;
-        case 3:
-            input.reply("No, " + x.replace("[Noun]", "Deez Nuts").text());
-            break;
-        case 4:
-            input.reply("No, " + x.replace("[Verb]", "exterminate").text());
-            break;
-        case 5:
-            input.reply("No, " + x.replace("[Noun]", "avocado").text());
+            chat("No, " + x.to_future().text());
             break;
     }
     
     
 }
 //add in order of priority
-addModule(avocad);
-addModule(xkcd);
-addModule(admin);
+
 addModule(whatThink);
 addModule(greeting);
 addModule(iAm);
-addModule(who);
+//addModule(who);
 addModule(binaryAnswer);
 addModule(questions);
 addModule(its);
 addModule(statement);
-start();
+
 </script>
+ <footer> <input type="text" id="textbox" onkeydown = "if (event.keyCode == 13) onMessage()" ></input>
+      <button onclick="onMessage()">send message</button></footer>
+</body>
